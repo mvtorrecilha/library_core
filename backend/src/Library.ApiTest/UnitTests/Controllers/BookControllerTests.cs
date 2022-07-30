@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Library.ApiTest.UnitTests
@@ -36,7 +37,7 @@ namespace Library.ApiTest.UnitTests
         }
 
         [Fact]
-        public void PostBorrowBook_InvalidAction_ShouldBeNotFoundAndHasError()
+        public async Task PostBorrowBook_InvalidAction_ShouldBeNotFoundAndHasError()
         {
             // Arrange
             string invalidAction = "request";
@@ -54,7 +55,7 @@ namespace Library.ApiTest.UnitTests
 
             // Act
             var controller = GetController();
-            var result = controller.Post(borrowRequest, invalidAction);
+            await controller.Post(borrowRequest, invalidAction);
 
             // Assert
             _notifier.HasError.Should().BeTrue();
@@ -64,7 +65,7 @@ namespace Library.ApiTest.UnitTests
         }
 
         [Fact]
-        public void PostBorrowBook_EmptyEmail_ShouldHasError()
+        public async Task PostBorrowBook_EmptyEmail_ShouldHasError()
         {
             // Arrange
             _bookServiceMock.Setup(x => x.BorrowBookAsync(It.IsAny<BorrowRequest>(), It.IsAny<string>()))
@@ -77,7 +78,7 @@ namespace Library.ApiTest.UnitTests
 
             // Act
             var controller = GetController();
-            var result = controller.Post(borrowRequest, BorrowAction);
+            await controller.Post(borrowRequest, BorrowAction);
 
             // Assert
             string expectedError = Errors.EmailCannotBeEmpty;
@@ -87,7 +88,7 @@ namespace Library.ApiTest.UnitTests
         }
 
         [Fact]
-        public void PostBorrowBook_StudentNotFoundByEmailDataBase_ShouldHasError()
+        public async Task PostBorrowBook_StudentNotFoundByEmailDataBase_ShouldHasError()
         {
             // Arrange
             _bookServiceMock.Setup(x => x.BorrowBookAsync(It.IsAny<BorrowRequest>(), It.IsAny<string>()))
@@ -101,7 +102,7 @@ namespace Library.ApiTest.UnitTests
 
             // Act
             var controller = GetController();
-            var result = controller.Post(borrowRequest, BorrowAction);
+            await controller.Post(borrowRequest, BorrowAction);
 
             // Assert
             string expectedError = Errors.StudentNotFound;
@@ -111,7 +112,7 @@ namespace Library.ApiTest.UnitTests
         }
 
         [Fact]
-        public void PostBorrowBook_BookDoesntBelongToStudentCourse_ShouldHasError()
+        public async Task PostBorrowBook_BookDoesntBelongToStudentCourse_ShouldHasError()
         {
             // Arrange
             _bookServiceMock.Setup(x => x.BorrowBookAsync(It.IsAny<BorrowRequest>(), It.IsAny<string>()))
@@ -127,7 +128,7 @@ namespace Library.ApiTest.UnitTests
 
             // Act
             var controller = GetController();
-            var result = controller.Post(borrowRequest, BorrowAction);
+            await controller.Post(borrowRequest, BorrowAction);
 
             // Assert
             string expectedError = Errors.TheBookDoesNotBelongToTheCourseCategory;
@@ -137,7 +138,7 @@ namespace Library.ApiTest.UnitTests
         }
 
         [Fact]
-        public void PostBorrowBook_ValidBookAndEmail_ShouldBeSuccess()
+        public async Task PostBorrowBook_ValidBookAndEmail_ShouldBeSuccess()
         {
             // Arrange
             var borrowRequest = new BorrowRequest
@@ -148,7 +149,7 @@ namespace Library.ApiTest.UnitTests
 
             // Act
             var controller = GetController();
-            var result = controller.Post(borrowRequest, BorrowAction);
+            await controller.Post(borrowRequest, BorrowAction);
 
             // Assert
             _notifier.HasError.Should().BeFalse();
@@ -156,7 +157,7 @@ namespace Library.ApiTest.UnitTests
         }
 
         [Fact]
-        public void GetBooks_ReturnAllBooks()
+        public async Task GetBooks_ReturnAllBooks()
         {
             //Arrange
             var bookList = new List<Book>
@@ -194,7 +195,7 @@ namespace Library.ApiTest.UnitTests
 
             // Act
             var controller = GetController();
-            var result = controller.Get().Result;
+            var result = await controller.Get();
 
             // Assert
             result.Should().BeEquivalentTo(expected);

@@ -1,12 +1,11 @@
+using Library.Api.Configurations;
 using Library.Api.Helpers;
 using Library.IoC;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Library.Api
 {
@@ -23,39 +22,9 @@ namespace Library.Api
         {
             NativeInjectorBootStrapper.RegisterServices(services);
             services.AddScoped(typeof(IResponseFormatter), typeof(ResponseFormatter));
-
-            services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    IConfigurationSection googleAuthNSection =
-                        Configuration.GetSection("Authentication:Google");
-
-                    options.Authority = "https://accounts.google.com";
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = googleAuthNSection["Issuer"],
-                        ValidateAudience = true,
-                        ValidAudience = googleAuthNSection["Audience"],
-                        ValidateLifetime = true
-                    };
-                });
-
+            services.AddAuthenticationConfig(Configuration);
             services.AddControllers();
-            services.AddCors(setup =>
-            {
-                setup.AddPolicy("CorsPolicy", policy =>
-                {
-                    policy
-                        .WithOrigins("http://localhost:8080")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials()
-                        .SetIsOriginAllowedToAllowWildcardSubdomains();
-                });
-            });
-
+            services.AddCorsConfig();
             services.AddSwaggerGen();
         }
 
