@@ -1,6 +1,6 @@
 # Library Assessment
 
-Esse projeto tem como objetivo controlar o empréstimo de livros de uma biblioteca fictícia.
+API simples que visa controlar o empréstimo de livros de uma biblioteca.
 
 Algumas funcionalidades já estão presentes, são elas:
 * Login
